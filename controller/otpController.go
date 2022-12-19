@@ -39,7 +39,7 @@ func (c *OtpController) GetAll(ctx *fiber.Ctx) error {
 	}
 
 	ctx.Status(http.StatusOK).JSON(&fiber.Map{
-		"message": "fiber engine, records all get successfully",
+		"message": "fiber engine, otp registry all get successfully",
 		"count":   len(*personalRecords),
 		"data":    personalRecords,
 	})
@@ -124,12 +124,12 @@ func (c *OtpController) UpdateRecord(ctx *fiber.Ctx) error {
 
 	if err != nil {
 		ctx.Status(http.StatusBadRequest).JSON(
-			&fiber.Map{"message": "could not update personalRecord"})
+			&fiber.Map{"message": "could not update otp registry"})
 		return err
 	}
 
 	ctx.Status(http.StatusOK).JSON(&fiber.Map{
-		"message": "personalRecord update has been successfully",
+		"message": "otp registry update has been successfully",
 		"data":    otpRegistryNew,
 	})
 
@@ -155,16 +155,16 @@ func (c *OtpController) PatchRecord(ctx *fiber.Ctx) error {
 
 	fmt.Println(jsonMap)
 
-	personalRecordNew, err := c.svc.PatchRecord(userId, jsonMap)
+	otpRegistryNew, err := c.svc.PatchRecord(userId, jsonMap)
 	if err != nil {
 		ctx.Status(http.StatusBadRequest).JSON(
-			&fiber.Map{"message": "could not update personalRecord"})
+			&fiber.Map{"message": "could not update otp registry"})
 		return err
 	}
 
 	ctx.Status(http.StatusOK).JSON(&fiber.Map{
-		"message": "personalRecord update has been successfully",
-		"data":    personalRecordNew,
+		"message": "otp registry update has been successfully",
+		"data":    otpRegistryNew,
 	})
 
 	return nil
@@ -201,19 +201,32 @@ func (c *OtpController) CreateRecord(ctx *fiber.Ctx) error {
 	err := ctx.BodyParser(&otpRegistry)
 	if err != nil {
 		ctx.Status(http.StatusUnprocessableEntity).JSON(
-			&fiber.Map{"message": "request failed"})
+			&fiber.Map{"message": "request failed",
+				"result": false,
+			})
 		return err
 	}
 
 	log.Printf("data : %v", otpRegistry)
+
+	otpByID, _ := c.svc.GetRecordByID(otpRegistry.OtpID)
+	if otpByID != nil {
+		ctx.Status(http.StatusBadRequest).JSON(
+			&fiber.Map{
+				"message": "exists otp_id",
+				"result":  false,
+			})
+		return err
+	}
 
 	validator := validator.New()
 	err = validator.Struct(otpRegistry)
 
 	if err != nil {
 		ctx.Status(http.StatusUnprocessableEntity).JSON(
-			&fiber.Map{"message": err},
-		)
+			&fiber.Map{"message": err,
+				"result": false,
+			})
 		return err
 	}
 

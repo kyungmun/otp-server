@@ -8,7 +8,7 @@ type OtpRegistry struct {
 	SecretKey  string `gorm:"column:secret_key; type:varchar(32); not null" json:"secret_key"`
 	Algorithem string `gorm:"column:algorithem; type:varchar(8); not null" json:"algorithem" validate:"required"`
 	Digit      int    `gorm:"column:digit; type:int; not null" json:"digit" validate:"required"`
-	Cycel      int    `gorm:"column:cycle; type:int; not null" json:"cycle" validate:"required"`
+	Cycle      int    `gorm:"column:cycle; type:int; not null" json:"cycle" validate:"required"`
 }
 
 // TableName overrides the table name used by User to `tablename`

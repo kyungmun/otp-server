@@ -50,7 +50,7 @@ func (s *OtpServices) OtpVerify(otp_id string, otp_num string) (bool, string) {
 	fmt.Printf("%v\n", otpRegistry)
 
 	hasher := &gotp.Hasher{
-		HashName: "sha1",
+		HashName: "SHA1",
 		Digest:   sha1.New,
 	}
 
@@ -66,7 +66,7 @@ func (s *OtpServices) OtpVerify(otp_id string, otp_num string) (bool, string) {
 		}
 	}
 
-	otp := gotp.NewTOTP(otpRegistry.SecretKey, otpRegistry.Digit, otpRegistry.Cycel, hasher)
+	otp := gotp.NewTOTP(otpRegistry.SecretKey, otpRegistry.Digit, otpRegistry.Cycle, hasher)
 	otpValue := otp.Now()
 	fmt.Printf("current otp : %s\n", otpValue)
 
@@ -107,11 +107,9 @@ func (s *OtpServices) DeleteRecord(otp_id string) error {
 
 func (s *OtpServices) CreateRecord(otpRegistry *models.OtpRegistry) (*models.OtpRegistry, error) {
 
-	//secret key random
+	//secret key random (10byte 사용해야 base32 인코딩하면 패딩없이 16자리 나옴)
 	keylength := 10
 	otpRegistry.SecretKey = gotp.RandomSecret(keylength)
-	fmt.Println(otpRegistry.SecretKey)
-
 	otpRegistryNew, err := s.repo.Create(otpRegistry)
 
 	if err != nil {
@@ -120,8 +118,3 @@ func (s *OtpServices) CreateRecord(otpRegistry *models.OtpRegistry) (*models.Otp
 
 	return otpRegistryNew, nil
 }
-
-//6NOWKQMUYTUIHDVII6FAE2AO7Y
-//4S62BZNFXXSZLCRO
-//Z5G3TJYHUAIRK
-//GV7J6U34CJUR6G5N
