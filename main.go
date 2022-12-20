@@ -28,10 +28,11 @@ func main() {
 		DBName:   os.Getenv("DB_NAME"),
 	}
 
-	fmt.Printf("config : %v", config)
+	fmt.Printf("config : %v\n", config)
 
 	//db connect
-	db, err := repository.ConnectMysqlDB(config)
+	//db, err := repository.ConnectMysqlDB(config)
+	db, err := repository.ConnectSqliteDB(config)
 	if err != nil {
 		log.Fatal("could not load database")
 	}

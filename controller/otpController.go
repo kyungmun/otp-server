@@ -248,10 +248,10 @@ func (c *OtpController) CreateRecord(ctx *fiber.Ctx) error {
 
 func (c *OtpController) SetupRoutes(app *fiber.App) {
 	api := app.Group("/api/v1")
+	api.Post("/otp", c.CreateRecord)
 	api.Get("/otp", c.GetAll)
 	api.Get("/otp/:otp_id", c.GetRecordByID)
 	api.Get("/otp/verify/:otp_id", c.OtpVerify)
 	api.Put("/otp/:otp_id", c.UpdateRecord)
 	api.Patch("/otp/:otp_id", c.PatchRecord)
-	api.Post("/otp", c.CreateRecord)
 }
