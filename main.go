@@ -11,6 +11,7 @@ import (
 	"github.com/kyungmun/otp-server/models"
 	"github.com/kyungmun/otp-server/repository"
 	"github.com/kyungmun/otp-server/service"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -26,13 +27,19 @@ func main() {
 		User:     os.Getenv("DB_USER"),
 		SSLMode:  os.Getenv("DB_SSLMODE"),
 		DBName:   os.Getenv("DB_NAME"),
+		DBEngine: os.Getenv("DB_ENGINE"),
 	}
 
 	fmt.Printf("config : %v\n", config)
 
 	//db connect
-	//db, err := repository.ConnectMysqlDB(config)
-	db, err := repository.ConnectSqliteDB(config)
+	var db *gorm.DB
+	if config.DBEngine == "sqlite" {
+		db, err = repository.ConnectSqliteDB(config)
+	} else {
+		db, err = repository.ConnectMysqlDB(config)
+	}
+
 	if err != nil {
 		log.Fatal("could not load database")
 	}

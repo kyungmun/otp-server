@@ -17,6 +17,6 @@ func ConnectSqliteDB(config *Config) (*gorm.DB, error) {
 		os.Exit(2)
 	}
 
-	log.Println("connected")
+	log.Println("connected sqlite db")
 	return db, nil
 }

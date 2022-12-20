@@ -7,4 +7,5 @@ type Config struct {
 	User     string
 	DBName   string
 	SSLMode  string
+	DBEngine string
 }
