@@ -33,8 +33,10 @@ func (c *OtpController) GetAll(ctx *fiber.Ctx) error {
 	}
 	personalRecords, err := c.svc.GetAll(page, pageSize)
 	if err != nil {
-		ctx.Status(http.StatusBadRequest).JSON(
-			&fiber.Map{"message": "could not get data"})
+		ctx.Status(http.StatusOK).JSON(&fiber.Map{
+			"message": err.Error(),
+			"result":  false,
+		})
 		return err
 	}
 
@@ -42,32 +44,34 @@ func (c *OtpController) GetAll(ctx *fiber.Ctx) error {
 		"message": "fiber engine, otp registry all get successfully",
 		"count":   len(*personalRecords),
 		"data":    personalRecords,
+		"result":  true,
 	})
 	return nil
 }
 
 func (c *OtpController) GetRecordByID(ctx *fiber.Ctx) error {
-	userId := ctx.Params("otp_id")
-	//log.Println("param id :" + id)
-	if userId == "" {
-		ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
-			"message": "id cannot be empty",
+	otp_id := ctx.Params("otp_id")
+	if otp_id == "" {
+		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "otp_id cannot be empty",
+			"result":  false,
 		})
 		return nil
 	}
 
-	personalRecord, err := c.svc.GetRecordByID(userId)
+	otpRegistry, err := c.svc.GetRecordByID(otp_id)
 	if err != nil {
 		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
-			"message": "could not get record",
+			"message": err.Error(),
+			"otp_id":  otp_id,
+			"result":  false,
 		})
-		return err
+		return nil
 	}
 
-	//log.Println(*personalRecords)
 	ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "record id gotten successfully",
-		"data":    personalRecord,
+		"data":    otpRegistry,
 	})
 	return nil
 }
@@ -77,8 +81,18 @@ func (c *OtpController) OtpVerify(ctx *fiber.Ctx) error {
 	otp_num := ctx.Query("otp_num", "0")
 
 	if otp_num == "0" {
-		ctx.Status(http.StatusOK).JSON(&fiber.Map{
+		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "required query name otp_num",
+			"otp_id":  otp_id,
+			"result":  false,
+		})
+		return nil
+	}
+
+	_, err := c.svc.GetRecordByID(otp_id)
+	if err != nil {
+		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": err.Error(),
 			"otp_id":  otp_id,
 			"result":  false,
 		})
@@ -90,7 +104,7 @@ func (c *OtpController) OtpVerify(ctx *fiber.Ctx) error {
 
 	if result {
 		ctx.Status(http.StatusOK).JSON(&fiber.Map{
-			"message":       "otp varify successfully",
+			"message":       "otp verify successfully",
 			"otp_id":        otp_id,
 			"otp_input_num": otp_num,
 			"otp_real_num":  otp_real_num,
@@ -98,7 +112,7 @@ func (c *OtpController) OtpVerify(ctx *fiber.Ctx) error {
 		})
 	} else {
 		ctx.Status(http.StatusOK).JSON(&fiber.Map{
-			"message":       "otp varify fail",
+			"message":       "otp verify fail",
 			"otp_id":        otp_id,
 			"otp_input_num": otp_num,
 			"otp_real_num":  otp_real_num,
@@ -114,8 +128,10 @@ func (c *OtpController) UpdateRecord(ctx *fiber.Ctx) error {
 
 	err := ctx.BodyParser(&otpRegistry)
 	if err != nil {
-		ctx.Status(http.StatusUnprocessableEntity).JSON(
-			&fiber.Map{"message": "request failed"})
+		ctx.Status(http.StatusUnprocessableEntity).JSON(&fiber.Map{
+			"message": err.Error(),
+			"result":  false,
+		})
 		return err
 	}
 	fmt.Println(otpRegistry)
@@ -123,14 +139,17 @@ func (c *OtpController) UpdateRecord(ctx *fiber.Ctx) error {
 	otpRegistryNew, err := c.svc.UpdateRecord(otpRegistry)
 
 	if err != nil {
-		ctx.Status(http.StatusBadRequest).JSON(
-			&fiber.Map{"message": "could not update otp registry"})
+		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": err.Error(),
+			"result":  false,
+		})
 		return err
 	}
 
 	ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "otp registry update has been successfully",
 		"data":    otpRegistryNew,
+		"result":  true,
 	})
 
 	return nil
@@ -139,8 +158,9 @@ func (c *OtpController) UpdateRecord(ctx *fiber.Ctx) error {
 func (c *OtpController) PatchRecord(ctx *fiber.Ctx) error {
 	userId := ctx.Params("id")
 	if userId == "" {
-		ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "id cannot be empty",
+			"result":  false,
 		})
 		return nil
 	}
@@ -157,14 +177,17 @@ func (c *OtpController) PatchRecord(ctx *fiber.Ctx) error {
 
 	otpRegistryNew, err := c.svc.PatchRecord(userId, jsonMap)
 	if err != nil {
-		ctx.Status(http.StatusBadRequest).JSON(
-			&fiber.Map{"message": "could not update otp registry"})
+		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "could not update otp registry",
+			"result":  false,
+		})
 		return err
 	}
 
 	ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": "otp registry update has been successfully",
 		"data":    otpRegistryNew,
+		"result":  true,
 	})
 
 	return nil
@@ -174,22 +197,35 @@ func (c *OtpController) DeleteRecord(ctx *fiber.Ctx) error {
 	otp_id := ctx.Params("otp_id")
 	log.Printf("param otp_id : %s", otp_id)
 	if otp_id == "" {
-		ctx.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "otp_id cannot be empty",
+			"result":  false,
 		})
 		return nil
 	}
 
-	err := c.svc.DeleteRecord(otp_id)
+	_, err := c.svc.GetRecordByID(otp_id)
 	if err != nil {
 		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
-			"message": "cannot delete otp_id",
+			"message": err.Error(),
+			"otp_id":  otp_id,
+			"result":  false,
+		})
+		return nil
+	}
+
+	err = c.svc.DeleteRecord(otp_id)
+	if err != nil {
+		ctx.Status(http.StatusOK).JSON(&fiber.Map{
+			"message": err.Error(),
+			"result":  false,
 		})
 		return err
 	}
 
 	ctx.Status(http.StatusOK).JSON(&fiber.Map{
 		"message": fmt.Sprintf("otp id [%s] delete successfully", otp_id),
+		"result":  true,
 	})
 
 	return nil
@@ -200,22 +236,19 @@ func (c *OtpController) CreateRecord(ctx *fiber.Ctx) error {
 
 	err := ctx.BodyParser(&otpRegistry)
 	if err != nil {
-		ctx.Status(http.StatusUnprocessableEntity).JSON(
-			&fiber.Map{"message": "request failed",
-				"result": false,
-			})
+		ctx.Status(http.StatusUnprocessableEntity).JSON(&fiber.Map{
+			"message": "request failed",
+			"result":  false,
+		})
 		return err
 	}
 
-	log.Printf("data : %v", otpRegistry)
-
-	otpByID, _ := c.svc.GetRecordByID(otpRegistry.OtpID)
-	if otpByID != nil {
-		ctx.Status(http.StatusBadRequest).JSON(
-			&fiber.Map{
-				"message": "exists otp_id",
-				"result":  false,
-			})
+	otpRecord, _ := c.svc.GetRecordByID(otpRegistry.OtpID)
+	if otpRecord != nil {
+		ctx.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "exists otp_id",
+			"result":  false,
+		})
 		return err
 	}
 
@@ -223,24 +256,27 @@ func (c *OtpController) CreateRecord(ctx *fiber.Ctx) error {
 	err = validator.Struct(otpRegistry)
 
 	if err != nil {
-		ctx.Status(http.StatusUnprocessableEntity).JSON(
-			&fiber.Map{"message": err,
-				"result": false,
-			})
+		ctx.Status(http.StatusUnprocessableEntity).JSON(&fiber.Map{
+			"message": err,
+			"result":  false,
+		})
 		return err
 	}
 
 	otpRegistryNew, err := c.svc.CreateRecord(otpRegistry)
 
 	if err != nil {
-		ctx.Status(http.StatusBadRequest).JSON(
-			&fiber.Map{"message": "could not create otp registry"})
+		ctx.Status(http.StatusOK).JSON(&fiber.Map{
+			"message": "could not create otp registry",
+			"result":  false,
+		})
 		return err
 	}
 
-	ctx.Status(http.StatusOK).JSON(&fiber.Map{
+	ctx.Status(http.StatusCreated).JSON(&fiber.Map{
 		"message": "otp registry Create has been successfully",
 		"data":    otpRegistryNew,
+		"result":  true,
 	})
 
 	return nil
@@ -254,4 +290,5 @@ func (c *OtpController) SetupRoutes(app *fiber.App) {
 	api.Get("/otp/verify/:otp_id", c.OtpVerify)
 	api.Put("/otp/:otp_id", c.UpdateRecord)
 	api.Patch("/otp/:otp_id", c.PatchRecord)
+	api.Delete("otp/:otp_id", c.DeleteRecord)
 }

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/kyungmun/otp-server/models"
 	"gorm.io/gorm"
 )
@@ -98,11 +97,11 @@ func (r *OtpRepository) DeleteByID(otp_id string) error {
 
 	otpRegistry := &models.OtpRegistry{}
 
-	result := r.db.Where("otp_id = ?", otp_id).First(otpRegistry)
-	if result.RowsAffected == 0 { // returns count of records found
-		fmt.Printf("count : 0")
-		return fiber.NewError(fiber.StatusNotFound, "No Record Found")
-	}
+	// result := r.db.Where("otp_id = ?", otp_id).First(otpRegistry)
+	// if result.RowsAffected == 0 { // returns count of records found
+	// 	fmt.Printf("count : 0")
+	// 	return fiber.NewError(fiber.StatusNotFound, "No Record Found")
+	// }
 
 	err := r.db.Where("otp_id = ?", otp_id).Delete(otpRegistry).Error
 	if err != nil {
@@ -113,14 +112,12 @@ func (r *OtpRepository) DeleteByID(otp_id string) error {
 }
 
 func (r *OtpRepository) GetByID(otp_id string) (*models.OtpRegistry, error) {
-	//fmt.Println(">> ", m.DBEngine)
 
 	otpRegistry := &models.OtpRegistry{}
-	//id := context.Params("id")
 
 	err := r.db.Where("otp_id = ?", otp_id).First(otpRegistry).Error
 	if err != nil {
-		log.Printf("%v", err)
+		//log.Printf("%v", err)
 		return nil, err
 	}
 

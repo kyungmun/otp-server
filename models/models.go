@@ -6,7 +6,7 @@ type OtpRegistry struct {
 	gorm.Model
 	OtpID      string `gorm:"column:otp_id; primaryKey; type:varchar(32); not null" json:"otp_id" validate:"required"`
 	SecretKey  string `gorm:"column:secret_key; type:varchar(32); not null" json:"secret_key"`
-	Algorithem string `gorm:"column:algorithem; type:varchar(8); not null" json:"algorithem" validate:"required"`
+	Algorithms string `gorm:"column:algorithms; type:varchar(8); not null" json:"algorithms" validate:"required"`
 	Digit      int    `gorm:"column:digit; type:int; not null" json:"digit" validate:"required"`
 	Cycle      int    `gorm:"column:cycle; type:int; not null" json:"cycle" validate:"required"`
 }

@@ -54,14 +54,14 @@ func (s *OtpServices) OtpVerify(otp_id string, otp_num string) (bool, string) {
 		Digest:   sha1.New,
 	}
 
-	if otpRegistry.Algorithem == "SHA256" {
+	if otpRegistry.Algorithms == "SHA256" {
 		hasher = &gotp.Hasher{
-			HashName: otpRegistry.Algorithem,
+			HashName: otpRegistry.Algorithms,
 			Digest:   sha256.New,
 		}
-	} else if otpRegistry.Algorithem == "SHA512" {
+	} else if otpRegistry.Algorithms == "SHA512" {
 		hasher = &gotp.Hasher{
-			HashName: otpRegistry.Algorithem,
+			HashName: otpRegistry.Algorithms,
 			Digest:   sha512.New,
 		}
 	}
