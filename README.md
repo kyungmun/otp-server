@@ -20,5 +20,8 @@ sqlite3 사용시 cgo 필요하여 cgo_enable=1 해야하며
 윈도우는 mingw 설치필요 하고
   빌드시에 CC=x86_64-w64-mingw32-gcc 옵션을 넣고 해야함.
 리눅스는 gnu 설치필요?
-  빌드시에 CC=x86_64-linux-gnu-gcc 옵션을 넣고 해야함
+https://github.com/mattn/go-sqlite3/blob/master/README.md#cross-compile
+
+CC=x86_64-linux-musl-gcc CXX=x86_64-linux-musl-g++ GOARCH=amd64 GOOS=linux CGO_ENABLED=1 go build -ldflags "-s -w -linkmode external -extldflags -static" -o bin/app-amd64-linux-2 main.go
+
 -ldflags "-s -w" 옵션으로 크기 줄이기
