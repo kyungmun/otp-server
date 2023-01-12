@@ -107,8 +107,10 @@ func (s *OtpServices) DeleteRecord(otp_id string) error {
 
 func (s *OtpServices) CreateRecord(otpRegistry *models.OtpRegistry) (*models.OtpRegistry, error) {
 
-	//secret key random (10byte 사용해야 base32 인코딩하면 패딩없이 16자리 나옴)
-	keylength := 10
+	//secret key random
+	//10byte 사용하면 base32 인코딩시 패딩없이 16자리 나옴
+	//20byte 사용하면 base32 인코딩시 패딩없이 32자리 나옴
+	keylength := 20
 	otpRegistry.SecretKey = gotp.RandomSecret(keylength)
 	otpRegistryNew, err := s.repo.Create(otpRegistry)
 

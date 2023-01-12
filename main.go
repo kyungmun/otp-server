@@ -49,19 +49,19 @@ func main() {
 		log.Fatal("could not migrate db")
 	}
 
-	//레토지토리 생성하면서 db 연결
+	//1. 레토지토리 생성하면서 db 연결
 	otpRepo, err := repository.NewOtpRepository(db)
 	if err != nil {
 		log.Fatal("could not otp repository create")
 	}
 
-	//서비스에 레포지토리 연결
+	//2. 서비스에 레포지토리 연결
 	otpService, err := service.NewOtpServices(otpRepo)
 	if err != nil {
 		log.Fatal("could not otp services create")
 	}
 
-	//fiber controller engine 생성하고 서비스 연결
+	//3. fiber controller engine 생성하고 서비스 연결
 	fiberApp := controller.NewFiber()
 	fiberApp.SetupRoutes(otpService)
 
