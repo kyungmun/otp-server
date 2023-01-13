@@ -72,12 +72,15 @@ func main() {
 	})
 
 	// Render index template
-	fiberApp.App.Get("/", func(c *fiber.Ctx) error {
-		return c.Render("index", fiber.Map{
-			"Title": "Google OTP Server",
-			"Name":  "by Kyungmun, lim",
+	/*
+		fiberApp.App.Get("/", func(c *fiber.Ctx) error {
+			return c.Render("index", fiber.Map{
+				"Title": "Google OTP Server",
+				"Name":  "by Kyungmun, lim",
+			})
 		})
-	})
+	*/
+	fiberApp.App.Static("/", "./views")
 
 	fiberApp.Listen(":8082")
 }

@@ -1,8 +1,45 @@
 <!DOCTYPE html>
-<body>
-    <h1>{{.Title}}</h1>
-    {{if .Name}}
-    <p>{{.Name}}</p>
-    {{end}}
-</body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vue Basics</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jost:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://unpkg.com/vue@next" defer></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <section id="otplist">
+      <p> {{ title }} </p>
+      <div>
+        <img v-bind:src="imageLink" width="100" height="100"/>
+      </div>
+      <div>
+        <button v-on:click="getOtplist()">refresh</button>
+      </div>
+      <tbody>
+        <table border="1" align = "center" width="100%">
+          <th>NO</th>
+          <th>ID</th>
+          <th>시크릿키</th>
+          <th>알고리즘</th>
+          <th>자릿수</th>
+          <th>갱신주기</th>
+          <tr v-for="(item, index) in otpdatas">
+              <td> {{ index + 1 }} </td>
+              <td> {{ item.otp_id }} </td>
+              <td> {{ item.secret_key }} </td>
+              <td> {{ item.algorithms }} </td>
+              <td> {{ item.digit }} </td>
+              <td> {{ item.cycle }} </td>
+          </tr> 
+        </table>
+      </tbody>
+    </section>
+  </body>
 </html>
