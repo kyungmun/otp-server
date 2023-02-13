@@ -16,7 +16,7 @@ type OtpRepository struct {
 	db *gorm.DB
 }
 
-func Paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
+func (r *OtpRepository) paginate(page, pageSize int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		if page == 0 {
 			page = 1
@@ -43,7 +43,7 @@ func (r *OtpRepository) GetAll(page, pageSize int) (*[]models.OtpRegistry, error
 			return nil, err
 		}
 	} else {
-		err := r.db.Scopes(Paginate(page, pageSize)).Find(otpRegistrys).Error
+		err := r.db.Scopes(r.paginate(page, pageSize)).Find(otpRegistrys).Error
 		if err != nil {
 			return nil, err
 		}

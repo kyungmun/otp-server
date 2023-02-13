@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/kyungmun/otp-server/middleware"
 	"github.com/kyungmun/otp-server/models"
 	"github.com/kyungmun/otp-server/service"
 )
@@ -284,11 +285,11 @@ func (c *OtpController) CreateRecord(ctx *fiber.Ctx) error {
 
 func (c *OtpController) SetupRoutes(app *fiber.App) {
 	api := app.Group("/api/v1")
-	api.Post("/otp", c.CreateRecord)
+	api.Post("/otp", middleware.Protected(), c.CreateRecord)
 	api.Get("/otp", c.GetAll)
 	api.Get("/otp/:otp_id", c.GetRecordByID)
 	api.Get("/otp/verify/:otp_id", c.OtpVerify)
-	api.Put("/otp/:otp_id", c.UpdateRecord)
-	api.Patch("/otp/:otp_id", c.PatchRecord)
-	api.Delete("otp/:otp_id", c.DeleteRecord)
+	api.Put("/otp/:otp_id", middleware.Protected(), c.UpdateRecord)
+	api.Patch("/otp/:otp_id", middleware.Protected(), c.PatchRecord)
+	api.Delete("otp/:otp_id", middleware.Protected(), c.DeleteRecord)
 }

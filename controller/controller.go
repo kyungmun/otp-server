@@ -64,7 +64,7 @@ func (f *FiberHendler) SetupRoutes2(repo *repository.OtpRepository) {
 	otpController.SetupRoutes(f.App)
 }
 
-func (f *FiberHendler) SetupRoutes(svc *service.OtpServices) {
+func (f *FiberHendler) SetupOtpRoutes(svc *service.OtpServices) {
 	//OTP 정보 관리
 
 	//컨트롤러에 서비스 주입
@@ -72,4 +72,24 @@ func (f *FiberHendler) SetupRoutes(svc *service.OtpServices) {
 
 	//컨트롤러 라우팅 설정
 	otpController.SetupRoutes(f.App)
+}
+
+func (f *FiberHendler) SetupUserRoutes(svc *service.UserServices) {
+	//OTP 정보 관리
+
+	//컨트롤러에 서비스 주입
+	userController := NewUserController(svc)
+
+	//컨트롤러 라우팅 설정
+	userController.SetupRoutes(f.App)
+}
+
+func (f *FiberHendler) SetupAuthRoutes(svc *service.UserServices) {
+	//OTP 정보 관리
+
+	//컨트롤러에 서비스 주입
+	authController := NewAuthController(svc)
+
+	//컨트롤러 라우팅 설정
+	authController.SetupRoutes(f.App)
 }
