@@ -2,7 +2,7 @@ package models
 
 import "gorm.io/gorm"
 
-type OtpRegistry struct {
+type Otp struct {
 	gorm.Model
 	OtpID      string `gorm:"column:otp_id; primaryKey; type:varchar(32); not null" json:"otp_id" validate:"required"`
 	SecretKey  string `gorm:"column:secret_key; type:varchar(32); not null" json:"secret_key"`
@@ -18,25 +18,25 @@ type OtpRegistry struct {
 //}
 
 func MigrateOtpRegistrys(db *gorm.DB) error {
-	err := db.AutoMigrate(&OtpRegistry{})
+	err := db.AutoMigrate(&Otp{})
 	return err
 }
 
 // 데이터 저장용 인터페이스
 type OtpRepository interface {
-	GetIndex() ([]*OtpRegistry, error)
-	GetByID(otp_id string) (*OtpRegistry, error)
-	Fetch(offset, limit int) ([]*OtpRegistry, error)
-	Create(otpRegistry *OtpRegistry) (*OtpRegistry, error)
-	Update(otp_id string, otpRegistry *OtpRegistry) (*OtpRegistry, error)
+	GetIndex() ([]*Otp, error)
+	GetByID(otp_id string) (*Otp, error)
+	Fetch(offset, limit int) ([]*Otp, error)
+	Create(otpRegistry *Otp) (*Otp, error)
+	Update(otp_id string, otpRegistry *Otp) (*Otp, error)
 	Delete(otp_id string) error
 }
 
 // 데이터 비즈니스로직 처리용 인터페이스
 type OtpRegistryUseCase interface {
-	GetByID(otp_id string) (*OtpRegistry, error)
-	Fetch(offset, limit int) ([]*OtpRegistry, error)
-	Create(otpRegistry *OtpRegistry) (*OtpRegistry, error)
-	Update(otp_id string, otpRegistry *OtpRegistry) (*OtpRegistry, error)
+	GetByID(otp_id string) (*Otp, error)
+	Fetch(offset, limit int) ([]*Otp, error)
+	Create(otpRegistry *Otp) (*Otp, error)
+	Update(otp_id string, otpRegistry *Otp) (*Otp, error)
 	Delete(otp_id string) error
 }

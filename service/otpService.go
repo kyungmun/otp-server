@@ -22,77 +22,77 @@ type OtpServices struct {
 	repo *repository.OtpRepository
 }
 
-func (s *OtpServices) GetAll(page, pageSize int) (*[]models.OtpRegistry, error) {
-	otpRegistrys, err := s.repo.GetAll(page, pageSize)
+func (s *OtpServices) GetAll(page, pageSize int) (*[]models.Otp, error) {
+	Otps, err := s.repo.GetAll(page, pageSize)
 	if err != nil {
 		return nil, err
 	}
-	return otpRegistrys, nil
+	return Otps, nil
 }
 
-func (s *OtpServices) GetRecordByID(id string) (*models.OtpRegistry, error) {
+func (s *OtpServices) GetRecordByID(id string) (*models.Otp, error) {
 
-	otpRegistry, err := s.repo.GetByID(id)
+	Otp, err := s.repo.GetByID(id)
 	if err != nil {
 		return nil, err
 	}
 
-	return otpRegistry, nil
+	return Otp, nil
 }
 
 func (s *OtpServices) OtpVerify(otp_id string, otp_num string) (bool, string) {
 
-	otpRegistry, err := s.repo.GetByID(otp_id)
+	Otp, err := s.repo.GetByID(otp_id)
 	if err != nil {
 		return false, ""
 	}
 
-	fmt.Printf("%v\n", otpRegistry)
+	fmt.Printf("%v\n", Otp)
 
 	hasher := &gotp.Hasher{
 		HashName: "SHA1",
 		Digest:   sha1.New,
 	}
 
-	if otpRegistry.Algorithms == "SHA256" {
+	if Otp.Algorithms == "SHA256" {
 		hasher = &gotp.Hasher{
-			HashName: otpRegistry.Algorithms,
+			HashName: Otp.Algorithms,
 			Digest:   sha256.New,
 		}
-	} else if otpRegistry.Algorithms == "SHA512" {
+	} else if Otp.Algorithms == "SHA512" {
 		hasher = &gotp.Hasher{
-			HashName: otpRegistry.Algorithms,
+			HashName: Otp.Algorithms,
 			Digest:   sha512.New,
 		}
 	}
 
-	otp := gotp.NewTOTP(otpRegistry.SecretKey, otpRegistry.Digit, otpRegistry.Cycle, hasher)
+	otp := gotp.NewTOTP(Otp.SecretKey, Otp.Digit, Otp.Cycle, hasher)
 	otpValue := otp.Now()
 	fmt.Printf("current otp : %s\n", otpValue)
 
 	return otp.Verify(otp_num, time.Now().Unix()), otpValue
 }
 
-func (s *OtpServices) UpdateRecord(otpRegistry *models.OtpRegistry) (*models.OtpRegistry, error) {
+func (s *OtpServices) UpdateRecord(Otp *models.Otp) (*models.Otp, error) {
 
-	otpRegistryNew, err := s.repo.UpdateRecord(otpRegistry)
+	OtpNew, err := s.repo.UpdateRecord(Otp)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return otpRegistryNew, nil
+	return OtpNew, nil
 }
 
-func (s *OtpServices) PatchRecord(userId string, jsonData map[string]interface{}) (*models.OtpRegistry, error) {
+func (s *OtpServices) PatchRecord(userId string, jsonData map[string]interface{}) (*models.Otp, error) {
 
-	otpRegistryNew, err := s.repo.PatchRecord(userId, jsonData)
+	OtpNew, err := s.repo.PatchRecord(userId, jsonData)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return otpRegistryNew, nil
+	return OtpNew, nil
 }
 
 func (s *OtpServices) DeleteRecord(otp_id string) error {
@@ -105,18 +105,18 @@ func (s *OtpServices) DeleteRecord(otp_id string) error {
 	return nil
 }
 
-func (s *OtpServices) CreateRecord(otpRegistry *models.OtpRegistry) (*models.OtpRegistry, error) {
+func (s *OtpServices) CreateRecord(Otp *models.Otp) (*models.Otp, error) {
 
 	//secret key random
 	//10byte 사용하면 base32 인코딩시 패딩없이 16자리 나옴
 	//20byte 사용하면 base32 인코딩시 패딩없이 32자리 나옴
 	keylength := 20
-	otpRegistry.SecretKey = gotp.RandomSecret(keylength)
-	otpRegistryNew, err := s.repo.Create(otpRegistry)
+	Otp.SecretKey = gotp.RandomSecret(keylength)
+	OtpNew, err := s.repo.Create(Otp)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return otpRegistryNew, nil
+	return OtpNew, nil
 }

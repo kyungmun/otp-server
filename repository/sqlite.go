@@ -19,7 +19,7 @@ func ConnectSqliteDB(config *Config) (*gorm.DB, error) {
 		os.Exit(2)
 	}
 
-	err = db.AutoMigrate(&models.OtpRegistry{},
+	err = db.AutoMigrate(&models.Otp{},
 		&models.User{})
 
 	if err != nil {

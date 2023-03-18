@@ -24,7 +24,7 @@ func ConnectMysqlDB(config *Config) (*gorm.DB, error) {
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	//db.Set("gorm:table_options", "ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_bin")
 
-	err = db.AutoMigrate(&models.OtpRegistry{},
+	err = db.AutoMigrate(&models.Otp{},
 		&models.User{})
 
 	if err != nil {
